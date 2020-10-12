@@ -1,0 +1,72 @@
+server:
+  port: 9003
+
+
+spring:
+  application:
+    name: zuul
+  main:
+   allow-bean-definition-overriding: true
+  sleuth:
+    sampler:
+      rate: 1
+  zipkin:
+    base-url: http://localhost:9411/
+    service:
+      name: zuul
+    sender:
+      type: kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+
+
+# eureka的配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:9002/eureka/
+
+
+zuul:
+#  ignored-services: '*'
+#  routes:
+#    config: /config/**
+  prefix: /api
+  strip-prefix: true
+  sensitive-headers:
+  add-host-header: true
+
+
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: routes
+
+ribbon:
+  ReadTimeout: 60000
+  SocketTimeout: 60000
+
+security:
+  oauth2:
+    client: # 表示这是一个oauth2客户端，获取token
+      client-id: zuul_server
+      client-secret: 123456
+      access-token-uri: http://localhost:8001/uaa/oauth/token
+      user-authorization-uri: http://localhost:8001/uaa/oauth/authorize
+    resource: # 用于获取tokenKey,解析token
+      jwt:
+        key-value: auth
+      token-info-uri: http://localhost:8001/uaa/oauth/check_token
+
+path:
+  auth-path:
+    - /api/**  #需要验证token的请求地址
+  user-login-path:
+    - /api/auth/uaa/login/** # 登录请求地址

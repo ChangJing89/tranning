@@ -1,0 +1,5 @@
+FROM docker.io/anapsix/alpine-java
+WORKDIR /opt/app/springcloud/
+COPY ./target/eureka-0.0.1-SNAPSHOT.jar /opt/app/springcloud/
+EXPOSE 9001
+ENTRYPOINT ["java","-jar","/opt/app/springcloud/eureka-0.0.1-SNAPSHOT.jar"]

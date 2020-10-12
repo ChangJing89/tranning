@@ -1,0 +1,42 @@
+server:
+  port: 9004
+
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+      - id: api-base-service
+        uri: lb://base
+        predicates:
+        - Path=/base/**
+
+
+# eureka的配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:9002/eureka/
+
+
+security:
+  oauth2:
+    client: # 表示这是一个oauth2客户端，获取token
+      client-id: zuul_server
+      client-secret: 123456
+      access-token-uri: http://localhost:8001/uaa/oauth/token
+      user-authorization-uri: http://localhost:8001/uaa/oauth/authorize
+    resource: # 用于获取tokenKey,解析token
+      jwt:
+        key-value: auth
+      token-info-uri: http://localhost:8001/uaa/oauth/check_token

@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    config:
+      server:
+        git: # 使用Git作为后端存储库
+          uri: https://github.com/ChangJing89/spring-cloud-config.git # git的url,使用https
+          search-paths: test # Git中查找配置文件的路径
+          username: Changjing89
+          password: C890408j

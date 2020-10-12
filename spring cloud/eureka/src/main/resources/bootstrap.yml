@@ -1,0 +1,48 @@
+server:
+  port: 9002
+
+spring:
+  application:
+    name: eureka
+  profiles:
+    active: dev
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+# spring cloud eureka 服务端的配置
+eureka:
+  instance:
+    hostname: ${eureka.hostname}
+  client:
+    registerWithEureka: false # 不使用Eureka服务进行注册
+    fetchRegistry: false # 不在本地缓存注册表信息
+    service-url:
+      defaultZone: http://${eureka.hostname}:${server.port}/eureka/
+
+---
+spring:
+  profiles: dev
+  cloud: #config的配置信息需要写在bootstrap.yml文件中
+    config:
+      uri: http://127.0.0.1:9001
+      label: master
+      name: eureka
+
+
+---
+spring:
+  profiles: prod
+  cloud: #config的配置信息需要写在bootstrap.yml文件中
+    config:
+      uri: http://172.19.0.2:9001
+      label: master
+      name: eureka
+
+---
+
+

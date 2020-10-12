@@ -1,0 +1,74 @@
+server:
+  port: 8004
+
+spring:
+  application:
+    name: teacher
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/s_school_management?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: C890408j
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  zipkin:
+    base-url: http://localhost:9411/
+    service:
+      name: teacher
+    sender:
+      type: kafka
+  sleuth:
+    sampler:
+      rate: 1
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092
+      bindings:
+        teacher-out:
+          destination: teacher-topic
+          group: teacher-group
+          content-type: application/json
+
+# eureka的配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:9002/eureka/
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        key-uri: http://localhost:8001/uaa/oauth/token_key	#如果使用JWT，可以获取公钥用于 token 的验签
+        key-value: auth
+      user-info-uri: http://localhost:8001/uaa/user
+      token-info-uri: http://localhost:8001/uaa/oauth/check_token
+ribbon:
+  eureka:
+    enabled: true
+
+feign:
+  hystrix:
+    enabled: false # 开启Hystrix熔断器
+
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+            #如果配置ribbon的重试，hystrix的超时时间要大于ribbon的超时时间，ribbon才会重试
+            #hystrix的超时时间=(1 + MaxAutoRetries + MaxAutoRetriesNextServer) * ReadTimeout 比较好，具体看需求
+

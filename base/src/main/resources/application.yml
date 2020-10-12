@@ -1,0 +1,77 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: base
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/s_user_management?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: C890408j
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    stream:
+      default-binder: kafka
+      kafka:
+        binder:
+          brokers:
+          - localhost:9092 #Kafka的消息中间件服务器地址
+      bindings:
+        output:
+          destination: user-topic #消息发往目的地 对应topic
+          group: user-group #对应kafka的group
+          content-type: application/json #消息的格式
+  zipkin:
+    sender:
+      type: kafka
+    base-url: http://localhost:9411/
+    service:
+      name: base
+  sleuth:
+    sampler:
+      rate: 1
+
+
+# eureka的配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:9002/eureka/
+
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        key-uri: http://localhost:8001/uaa/oauth/token_key	#如果使用JWT，可以获取公钥用于 token 的验签
+        key-value: auth
+      user-info-uri: http://localhost:8001/uaa/user
+      token-info-uri: http://localhost:8001/uaa/oauth/check_token
+#    client:
+#      access-token-uri: http://localhost:8001/uaa/oauth/token	#令牌端点
+#      user-authorization-uri: http://localhost:8001/uaa/oauth/authorize	#授权端点
+#      client-id: base
+#      client-secret: 123456
+
+ribbon:
+  eureka:
+    enabled: true
+
+
+
+logging:
+  pattern:
+    level: '%5p[${spring.zipkin.service.name:${spring.application.name:-}},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]'
+  level:
+    org.springframework.cloud.openfeign: debug
+    org.springframework.cloud.sleuth: debug
+
