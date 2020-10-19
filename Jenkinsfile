@@ -1,7 +1,9 @@
 pipeline {
     agent {
             docker {
+                label: 'windows'
                 image 'maven:3-alpine'
+                args '-v C:/repository:C:/repository'
             }
         }
     stages {
