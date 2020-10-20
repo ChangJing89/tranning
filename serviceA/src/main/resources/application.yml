@@ -8,7 +8,7 @@ spring:
 #    addresses: amqp://guest:guest@localhost
     host: localhost
     port: 5672
-    username: guest
-    password: guest
+    username: admin
+    password: admin
     publisher-returns: true #发送者开启return确认机制
     publisher-confirm-type: correlated # 发送者开启confirm机制
